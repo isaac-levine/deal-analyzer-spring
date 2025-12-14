@@ -1,0 +1,9 @@
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/deal_analyzer
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+
+# OpenAI Configuration
+spring.ai.openai.api-key=your-openai-api-key-here
