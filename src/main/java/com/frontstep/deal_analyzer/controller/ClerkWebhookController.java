@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpHeaders;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -38,11 +41,15 @@ public class ClerkWebhookController {
         // Verify webhook signature
         try {
             Webhook webhook = new Webhook(webhookSecret);
-            webhook.verify(payload, Map.of(
-                "svix-id", svixId,
-                "svix-timestamp", svixTimestamp,
-                "svix-signature", svixSignature
-            ));
+
+            // Build HttpHeaders for Svix verification
+            Map<String, List<String>> headersMap = new HashMap<>();
+            headersMap.put("svix-id", List.of(svixId));
+            headersMap.put("svix-timestamp", List.of(svixTimestamp));
+            headersMap.put("svix-signature", List.of(svixSignature));
+            HttpHeaders headers = HttpHeaders.of(headersMap, (k, v) -> true);
+
+            webhook.verify(payload, headers);
         } catch (WebhookVerificationException e) {
             log.error("Webhook verification failed", e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid signature");
